@@ -2,6 +2,7 @@
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.sql.*;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -9,36 +10,30 @@ import javax.servlet.http.HttpServletResponse;
 
 public class LoginServlet extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+    // JDBC driver name and database URL
+    static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+    static final String DB_URL="jdbc:mysql://localhost:3306/test";
+
+    //  Database credentials
+    static final String USER = "root";
+    static final String PASS = "password";
+
+
     protected static void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        // JDBC driver name and database URL
-        static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-        static final String DB_URL="jdbc:mysql://localhost/TEST";
-
-        //  Database credentials
-        static final String USER = "root";
-        static final String PASS = "password";
-
 
         // Retrieve the value of the query parameter "email" (from text field)
         String email = request.getParameter("email");
         // Retrieve the value of the query parameter "password" (from password field)
         String password = request.getParameter("password");
 
+        Connection conn = null;
+        Statement stmt = null;
+
         PrintWriter out = response.getWriter();
 
         try{
-           response.setContentType("text/html;charset=UTF-8");
+            response.setContentType("text/html;charset=UTF-8");
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -66,35 +61,33 @@ public class LoginServlet extends HttpServlet {
 
                 out.println("</body>");
                 out.println("</html>");
-
             }
             else
             {
                  // Register JDBC driver
-                 Class.forName("com.mysql.jdbc.Driver");
+                 Class.forName(JDBC_DRIVER).newInstance();
 
                  // Open a connection
-                 Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+                 conn = DriverManager.getConnection(DB_URL, USER, PASS);
 
                  // Execute SQL query
-                 Statement stmt = conn.createStatement();
+                 stmt = conn.createStatement();
                  String sql;
-                 sql = "SELECT id, first, last, age FROM Employees";
+                 sql = "SELECT * FROM users WHERE email = \'" + email
+                         + "\' AND password = \'" + password + "\'";
                  ResultSet rs = stmt.executeQuery(sql);
 
                  // Extract data from result set
-                 while(rs.next()){
+                 while(rs.next())
+		{
+                    System.out.println("smth arrived");
                     //Retrieve by column name
-                    int id  = rs.getInt("id");
-                    int age = rs.getInt("age");
-                    String first = rs.getString("first");
-                    String last = rs.getString("last");
+                    String em = rs.getString("email");
+                    String pass = rs.getString("password");
 
                     //Display values
-                    out.println("ID: " + id + "<br>");
-                    out.println(", Age: " + age + "<br>");
-                    out.println(", First: " + first + "<br>");
-                    out.println(", Last: " + last + "<br>");
+                    out.println("email: " + em + "<br>");
+                    out.println("password: " + pass + "<br>");
                  }
                  out.println("</body>");
                  out.println("</html>");
