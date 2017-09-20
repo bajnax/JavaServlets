@@ -18,7 +18,6 @@ public class LoginServlet extends HttpServlet {
     static final String USER = "root";
     static final String PASS = "password";
 
-
     protected static void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -38,13 +37,18 @@ public class LoginServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
+            out.println("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\">");
+            out.println("<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css\"");
+            out.println("integrity=\"sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M\" crossorigin=\"anonymous\">");
             out.println("<title>Servlet LoginServlet</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet LoginServlet at " + request.getContextPath() + "</h1>");
+
+            out.println("<div class=\"container\">");
 
             if(password == null || (password.trim()).length() == 0 || email == null || (email.trim()).length() == 0)
             {
+                out.println("<h1>Wrong username or password. LogIn Unsuccessful!</h1>");
                   // Get null if the parameter is missing from query string.
                   // Get empty string or string of white spaces if user did not fill in
                 if (email == null || (email.trim()).length() == 0) {
@@ -59,43 +63,75 @@ public class LoginServlet extends HttpServlet {
                    out.println("<p>Password: " + password + "</p>");
                 }
 
+                out.println("</div>");
+                out.println("<script src=\"https://code.jquery.com/jquery-3.2.1.slim.min.js\" integrity=\"sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN\" crossorigin=\"anonymous\"></script>");
+                out.println("<script src=\"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js\" integrity=\"sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4\" crossorigin=\"anonymous\"></script>");
+                out.println("<script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js\" integrity=\"sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1\" crossorigin=\"anonymous\"></script>");
+
                 out.println("</body>");
                 out.println("</html>");
             }
             else
             {
-                 // Register JDBC driver
-                 Class.forName(JDBC_DRIVER).newInstance();
+                // Register JDBC driver
+                Class.forName(JDBC_DRIVER).newInstance();
 
-                 // Open a connection
-                 conn = DriverManager.getConnection(DB_URL, USER, PASS);
+                // Open a connection
+                conn = DriverManager.getConnection(DB_URL, USER, PASS);
 
-                 // Execute SQL query
-                 stmt = conn.createStatement();
-                 String sql;
-                 sql = "SELECT * FROM users WHERE email = \'" + email
-                         + "\' AND password = \'" + password + "\'";
-                 ResultSet rs = stmt.executeQuery(sql);
+                // Execute SQL query
+                stmt = conn.createStatement();
+                String sql;
+                sql = "SELECT * FROM users WHERE email = \'" + email
+                        + "\' AND password = \'" + password + "\'";
+                ResultSet rs = stmt.executeQuery(sql);
+                out.println("<h2>Details of your account: </h2>");
+                out.println("<table class=\"table table-striped\">");
+                out.println("<thead>");
+                out.println("<tr>");
+                out.println("<th>Firstname</th>");
+                out.println("<th>Surname</th>");
+                out.println("<th>Email</th>");
+                out.println("<th>Password</th>");
+                out.println("</tr>");
+                out.println("</thead>");
 
-                 // Extract data from result set
-                 while(rs.next())
-		{
-                    System.out.println("smth arrived");
-                    //Retrieve by column name
-                    String em = rs.getString("email");
-                    String pass = rs.getString("password");
+                // Extract data from result set
+                while(rs.next())
+               {
+                  out.println("<tr>");
 
-                    //Display values
-                    out.println("email: " + em + "<br>");
-                    out.println("password: " + pass + "<br>");
-                 }
-                 out.println("</body>");
-                 out.println("</html>");
+                   //Retrieve by column name
+                   String fname = rs.getString("fname");
+                   String sname = rs.getString("sname");
+                   String mail = rs.getString("email");
+                   String pass = rs.getString("password");
 
-                 // Clean-up environment
-                 rs.close();
-                 stmt.close();
-                 conn.close();
+                   //Display values
+                   out.println("<td>" + fname + "</td>");
+                   out.println("<td>" + sname + "</td>");
+                   out.println("<td>" + mail + "</td>");
+                   out.println("<td>" + pass + "</td>");
+
+                   out.println("</tr>");
+                }
+
+                out.println("</tbody>");
+                out.println("</table>");
+
+                out.println("</div>");
+
+                out.println("<script src=\"https://code.jquery.com/jquery-3.2.1.slim.min.js\" integrity=\"sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN\" crossorigin=\"anonymous\"></script>");
+                out.println("<script src=\"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js\" integrity=\"sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4\" crossorigin=\"anonymous\"></script>");
+                out.println("<script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js\" integrity=\"sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1\" crossorigin=\"anonymous\"></script>");
+
+                out.println("</body>");
+                out.println("</html>");
+
+                // Clean-up environment
+                rs.close();
+                stmt.close();
+                conn.close();
             }
 
         }catch(SQLException se) {
@@ -120,20 +156,17 @@ public class LoginServlet extends HttpServlet {
       } //end try
     }
 
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
 
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
-
 
     @Override
     public String getServletInfo() {
