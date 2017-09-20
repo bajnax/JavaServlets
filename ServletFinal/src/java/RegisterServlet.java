@@ -45,17 +45,6 @@ public class RegisterServlet extends HttpServlet {
       {
         String sql;
         ResultSet rs;
-          
-        // Register JDBC driver
-        Class.forName(JDBC_DRIVER).newInstance();
-        // Open a connection
-        conn = DriverManager.getConnection(DB_URL, USER, PASS);
-        // Execute SQL query
-        stmt = conn.createStatement();
-        
-        sql = "SELECT * FROM users WHERE email = \'" + email
-                + "\'";
-        rs = stmt.executeQuery(sql);
 
         response.setContentType("text/html;charset=UTF-8");
         /* TODO output your page here. You may use following sample code. */
@@ -70,61 +59,73 @@ public class RegisterServlet extends HttpServlet {
         out.println("<body>");
 
         out.println("<div class=\"container\">");
-
-        //check the size of ResultSet
-        int size= 0;
-        if (rs != null)
+   
+        if( (email.length() == 0) || (password.length() == 0) )
         {
-          rs.beforeFirst();
-          rs.last();
-          size = rs.getRow();
-        }
-
-        if(size != 0)
-        {
-            out.println("<h1>The user with specified email already exists: </h1>");
+            // Since email is a primary key in the DB and password is required for Login Form
+            out.println("<h2>Fill in the Register Form at least email and password!</h2>");
             out.println("<a href=\"index.html\" class=\"btn btn-primary\" role=\"button\">Get back</a>");
         }
         else
-        {              
-            sql = "INSERT INTO users (email,password,fname,sname)" +
-            "VALUES (" + "\'" + email + "\'," + " \'" + password + "\'," +
-            " \'" + fname + "\'," + " \'" + sname + "\')";
-            stmt.executeUpdate(sql);
+        {
+            // Register JDBC driver
+            Class.forName(JDBC_DRIVER).newInstance();
+            // Open a connection
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            // Execute SQL query
+            stmt = conn.createStatement();
 
-            out.println("<h1>Welcome! You are successfully registered! </h1>");
-            out.println("<h2>Details of your account: </h2>");
-            out.println("<table class=\"table table-striped\">");
-            out.println("<thead>");
-            out.println("<tr>");
-            out.println("<th>Firstname</th>");
-            out.println("<th>Surname</th>");
-            out.println("<th>Email</th>");
-            out.println("<th>Password</th>");
-            out.println("</tr>");
-            out.println("</thead>");
+            sql = "SELECT * FROM users WHERE email = \'" + email
+                    + "\'";
+            rs = stmt.executeQuery(sql);
+            
+            //check the size of ResultSet
+            int size= 0;
+            if (rs != null)
+            {
+              rs.beforeFirst();
+              rs.last();
+              size = rs.getRow();
+            }
 
-//            // Extract data from result set
-//            while(rs.next())
-//           {
-               out.println("<tr>");
-//               //Retrieve by column name
-//               String fname = rs.getString("fname");
-//               String sname = rs.getString("sname");
-//               String mail = rs.getString("email");
-//               String pass = rs.getString("password");
+            // if the user is already registered in the service
+            if(size != 0)
+            {
+                out.println("<h1>The user with specified email already exists: </h1>");
+                out.println("<a href=\"index.html\" class=\"btn btn-primary\" role=\"button\">Get back</a>");
+            }
+            else
+            {              
+                sql = "INSERT INTO users (email,password,fname,sname)" +
+                "VALUES (" + "\'" + email + "\'," + " \'" + password + "\'," +
+                " \'" + fname + "\'," + " \'" + sname + "\')";
+                stmt.executeUpdate(sql);
 
-               //Display values
-               out.println("<td>" + fname + "</td>");
-               out.println("<td>" + sname + "</td>");
-               out.println("<td>" + email + "</td>");
-               out.println("<td>" + password + "</td>");
+                out.println("<h1>Welcome! You are successfully registered! </h1>");
+                out.println("<h2>Details of your account: </h2>");
+                out.println("<table class=\"table table-striped\">");
+                out.println("<thead>");
+                  out.println("<tr>");
+                    out.println("<th>Firstname</th>");
+                    out.println("<th>Surname</th>");
+                    out.println("<th>Email</th>");
+                    out.println("<th>Password</th>");
+                  out.println("</tr>");
+                out.println("</thead>");
 
-               out.println("</tr>");
-//            }
+                  out.println("<tr>");
 
-            out.println("</tbody>");
-            out.println("</table>");
+                   //Display values
+                   out.println("<td>" + fname + "</td>");
+                   out.println("<td>" + sname + "</td>");
+                   out.println("<td>" + email + "</td>");
+                   out.println("<td>" + password + "</td>");
+
+                  out.println("</tr>");
+
+                out.println("</tbody>");
+                out.println("</table>");
+            }
         }
 
         out.println("</div>");
