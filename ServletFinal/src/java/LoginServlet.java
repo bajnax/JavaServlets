@@ -85,40 +85,50 @@ public class LoginServlet extends HttpServlet {
                 sql = "SELECT * FROM users WHERE email = \'" + email
                         + "\' AND password = \'" + password + "\'";
                 ResultSet rs = stmt.executeQuery(sql);
-                out.println("<h2>Details of your account: </h2>");
-                out.println("<table class=\"table table-striped\">");
-                out.println("<thead>");
-                out.println("<tr>");
-                out.println("<th>Firstname</th>");
-                out.println("<th>Surname</th>");
-                out.println("<th>Email</th>");
-                out.println("<th>Password</th>");
-                out.println("</tr>");
-                out.println("</thead>");
-
-                // Extract data from result set
+                //Retrieve by column name
+                String fname = null, sname = null, mail = null, pass = null;
+                
                 while(rs.next())
                {
-                  out.println("<tr>");
+                    //Retrieve by column name
+                    fname = rs.getString("fname");
+                    sname = rs.getString("sname");
+                    mail = rs.getString("email");
+                    pass = rs.getString("password");
+               }
+                
+                // matching email and password = LogIn
+                if(mail.trim().equals(email) && pass.trim().equals(password))
+                {
+                    out.println("<h2>Details of your account: </h2>");
+                    out.println("<table class=\"table table-striped\">");
+                     // Table Header
+                     out.println("<thead>");
+                      out.println("<tr>");
+                        out.println("<th>Firstname</th>");
+                        out.println("<th>Surname</th>");
+                        out.println("<th>Email</th>");
+                        out.println("<th>Password</th>");
+                      out.println("</tr>");
+                     out.println("</thead>");
+                      // Display values
+                      out.println("<tr>");                       
+                        out.println("<td>" + fname + "</td>");
+                        out.println("<td>" + sname + "</td>");
+                        out.println("<td>" + mail + "</td>");
+                        out.println("<td>" + pass + "</td>");
+                      out.println("</tr>");
 
-                   //Retrieve by column name
-                   String fname = rs.getString("fname");
-                   String sname = rs.getString("sname");
-                   String mail = rs.getString("email");
-                   String pass = rs.getString("password");
-
-                   //Display values
-                   out.println("<td>" + fname + "</td>");
-                   out.println("<td>" + sname + "</td>");
-                   out.println("<td>" + mail + "</td>");
-                   out.println("<td>" + pass + "</td>");
-
-                   out.println("</tr>");
+                     out.println("</tbody>");
+                    out.println("</table>");
                 }
-
-                out.println("</tbody>");
-                out.println("</table>");
-
+                else
+                {
+                    // mismatch of password and email
+                    out.println("<h1>Wrong email or password! </h1>");
+                    out.println("<a href=\"index.html\" class=\"btn btn-primary\" role=\"button\">Get back</a>");
+                }
+                
                 out.println("</div>");
 
                 out.println("<script src=\"https://code.jquery.com/jquery-3.2.1.slim.min.js\" integrity=\"sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN\" crossorigin=\"anonymous\"></script>");
