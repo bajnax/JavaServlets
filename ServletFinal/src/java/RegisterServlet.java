@@ -79,22 +79,7 @@ public class RegisterServlet extends HttpServlet {
                     + "\'";
             rs = stmt.executeQuery(sql);
             
-            //check the size of ResultSet
-            int size= 0;
-            if (rs != null)
-            {
-              rs.beforeFirst();
-              rs.last();
-              size = rs.getRow();
-            }
-
-            // if the user is already registered in the service
-            if(size != 0)
-            {
-                out.println("<h1>The user with specified email already exists: </h1>");
-                out.println("<a href=\"index.html\" class=\"btn btn-primary\" role=\"button\">Get back</a>");
-            }
-            else
+            if(!rs.next())
             {              
                 sql = "INSERT INTO users (email,password,fname,sname)" +
                 "VALUES (" + "\'" + email + "\'," + " \'" + password + "\'," +
@@ -125,6 +110,11 @@ public class RegisterServlet extends HttpServlet {
 
                 out.println("</tbody>");
                 out.println("</table>");
+            }
+            else   // if the user is already registered in the service        
+            {
+                out.println("<h1>The user with specified email already exists: </h1>");
+                out.println("<a href=\"index.html\" class=\"btn btn-primary\" role=\"button\">Get back</a>");
             }
         }
 

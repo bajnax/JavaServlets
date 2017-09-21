@@ -59,8 +59,6 @@ public class LoginServlet extends HttpServlet {
 
                 if (password == null || (password.trim()).length() == 0) {
                    out.println("<p>Password: MISSING</p>");
-                } else {
-                   out.println("<p>Password: " + password + "</p>");
                 }
                 
                 out.println("<a href=\"index.html\" class=\"btn btn-primary\" role=\"button\">Get back</a>");
@@ -92,17 +90,14 @@ public class LoginServlet extends HttpServlet {
                 
                 String fname = "", sname = "", mail = "", pass = "";
                 
-                //check the size of ResultSet
-                int size= 0;
-                if (rs != null)
+                if(!rs.next())
                 {
-                  rs.beforeFirst();
-                  rs.last();
-                  size = rs.getRow();
-                }
-                
-                if(size != 0)
-                {
+                 
+                    // database does not contain a record with specified email address
+                    out.println("<h1>Wrong email address!</h1>");
+                    out.println("<a href=\"index.html\" class=\"btn btn-primary\" role=\"button\">Get back</a>");
+                }else
+                {                  
                     rs.beforeFirst();
                     while(rs.next())
                     {
@@ -144,12 +139,6 @@ public class LoginServlet extends HttpServlet {
                             out.println("<a href=\"index.html\" class=\"btn btn-primary\" role=\"button\">Get back</a>");
                         }             
                     }
-                }
-                else
-                {
-                    // database does not contain a record with specified email address
-                    out.println("<h1>Wrong email address!</h1>");
-                    out.println("<a href=\"index.html\" class=\"btn btn-primary\" role=\"button\">Get back</a>");
                 }
                 
                 out.println("</div>");
