@@ -3,11 +3,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.sql.*;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
+import javax.servlet.http.HttpSession;
 
 public class RegisterServlet extends HttpServlet {
 
@@ -81,12 +82,16 @@ public class RegisterServlet extends HttpServlet {
             
             if(!rs.next())
             {              
+//                // create session
+//                HttpSession session=request.getSession();  
+//                session.setAttribute("username",email); 
+                
                 sql = "INSERT INTO users (email,password,fname,sname)" +
                 "VALUES (" + "\'" + email + "\'," + " \'" + password + "\'," +
                 " \'" + fname + "\'," + " \'" + sname + "\')";
                 stmt.executeUpdate(sql);
 
-                out.println("<h1>Welcome! You are successfully registered! </h1>");
+                out.println("<h1>Welcome, " + fname + " " + sname + "! You are successfully registered! </h1>");
                 out.println("<h2>Details of your account: </h2>");
                 out.println("<table class=\"table table-striped\">");
                 out.println("<thead>");
@@ -113,8 +118,9 @@ public class RegisterServlet extends HttpServlet {
             }
             else   // if the user is already registered in the service        
             {
-                out.println("<h1>The user with specified email already exists: </h1>");
+                out.println("<h2>The user with specified email already exists: </h2>");
                 out.println("<a href=\"index.html\" class=\"btn btn-primary\" role=\"button\">Get back</a>");
+                               
             }
         }
 

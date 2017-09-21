@@ -3,12 +3,15 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.sql.*;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 public class LoginServlet extends HttpServlet {
+    
 
     // JDBC driver name and database URL
     static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
@@ -18,7 +21,7 @@ public class LoginServlet extends HttpServlet {
     static final String USER = "root";
     static final String PASS = "password";
 
-    protected static void processRequest(HttpServletRequest request, HttpServletResponse response)
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         // Retrieve the value of the query parameter "email" (from text field)
@@ -78,24 +81,29 @@ public class LoginServlet extends HttpServlet {
 
                 // Open a connection
                 conn = DriverManager.getConnection(DB_URL, USER, PASS);
-
-                // Execute SQL query
                 stmt = conn.createStatement();
+                
+                // Execute SQL query               
                 String sql;
                 
                 // 'email' is a primary key. Therefore, only one record
                 // will be retreived, if present
                 sql = "SELECT * FROM users WHERE email = \'" + email + "\'";
+
                 ResultSet rs = stmt.executeQuery(sql);
                 
                 String fname = "", sname = "", mail = "", pass = "";
                 
                 if(!rs.next())
                 {
-                 
+                    out.println("<center>");
                     // database does not contain a record with specified email address
-                    out.println("<h1>Wrong email address!</h1>");
-                    out.println("<a href=\"index.html\" class=\"btn btn-primary\" role=\"button\">Get back</a>");
+                    out.println("<p>Wrong email address!</p>");
+                    //out.println("<a href=\"index.html\" class=\"btn btn-primary\" role=\"button\">Get back</a>");
+                    out.println("</center>");
+                    
+                    RequestDispatcher rd=request.getRequestDispatcher("/index.html");  
+                    rd.include(request, response);                    
                 }else
                 {                  
                     rs.beforeFirst();
@@ -110,7 +118,11 @@ public class LoginServlet extends HttpServlet {
                         // matching email and password = LogIn
                         if(mail.trim().equals(email) && pass.trim().equals(password))
                         {
-                            out.println("<h2>Details of your account: </h2>");
+                            // create session
+//                            HttpSession session=request.getSession();  
+//                            session.setAttribute("username",email);
+                            
+                            out.println("<h2>Welcome, " + fname + " " + sname + "! Details of your account: </h2>");
                             out.println("<table class=\"table table-striped\">");
                              // Table Header
                              out.println("<thead>");
@@ -194,5 +206,6 @@ public class LoginServlet extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+    
 
 }
