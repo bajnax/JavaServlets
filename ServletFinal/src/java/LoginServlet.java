@@ -122,9 +122,9 @@ public class LoginServlet extends HttpServlet {
                                 session.setAttribute("firstname", fname);
                                 session.setAttribute("surname", sname);
                                 session.setAttribute("password", pass);
-                                
+
                                 response.sendRedirect(request.getContextPath() + "/home");
-                            
+
                             }
                             else
                             {
