@@ -20,15 +20,7 @@ public class RegisterServlet extends HttpServlet {
   static final String USER = "root";
   static final String PASS = "password";
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+  
     protected static void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -104,7 +96,7 @@ public class RegisterServlet extends HttpServlet {
                   }
                   else   // if the user is already registered in the service        
                   {
-                      out.println("<h2>The user with specified email already exists: </h2>");
+                      out.println("<h2>The user with specified email already exists!</h2>");
                       out.println("<a href=\"index.html\" class=\"btn btn-primary\" role=\"button\">Get back</a>");
 
                   }

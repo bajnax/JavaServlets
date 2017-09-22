@@ -70,7 +70,10 @@ public class ProfileServlet extends HttpServlet {
 
                  out.println("</tbody>");
                 out.println("</table>");
+                
+                // buttons
                 out.println("<a href=\"LogOut\" class=\"btn btn-primary\" role=\"button\">Log out</a>");
+                out.println("<a href=\"unregister\" class=\"btn btn-primary\" role=\"button\">Delete Account</a>");
                 
                 out.println("</div>");
                 

@@ -30,7 +30,7 @@ public class LogOut extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException 
     {
-        // Checking if the session exist already
+        // Checking if the session exists already
         HttpSession session=request.getSession(false);
         
         if(session != null)
