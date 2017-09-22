@@ -3,7 +3,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.sql.*;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -11,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 public class LoginServlet extends HttpServlet {
-    
 
     // JDBC driver name and database URL
     static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
@@ -49,110 +47,181 @@ public class LoginServlet extends HttpServlet {
 
             out.println("<div class=\"container\">");
 
-            if(password == null || (password.trim()).length() == 0 || email == null || (email.trim()).length() == 0)
+            // Checking if the session exist already
+            HttpSession session=request.getSession(false);
+
+            if(session == null)
             {
-                out.println("<h1>Wrong username or password. LogIn Unsuccessful!</h1>");
-                  // Get null if the parameter is missing from query string.
-                  // Get empty string or string of white spaces if user did not fill in
-                if (email == null || (email.trim()).length() == 0) {
-                   out.println("<p>Name: MISSING</p>");
-                } else {
-                   out.println("<p>Name: " + email + "</p>");
+                if(password == null || (password.trim()).length() == 0 || email == null || (email.trim()).length() == 0)
+                {
+                    out.println("<h1>Wrong username or password. LogIn Unsuccessful!</h1>");
+                      // Get null if the parameter is missing from query string.
+                      // Get empty string or string of white spaces if user did not fill in
+                    if (email == null || (email.trim()).length() == 0) {
+                       out.println("<p>Name: MISSING</p>");
+                    } else {
+                       out.println("<p>Name: " + email + "</p>");
+                    }
+
+                    if (password == null || (password.trim()).length() == 0) {
+                       out.println("<p>Password: MISSING</p>");
+                    }
+
+                    out.println("<a href=\"index.html\" class=\"btn btn-primary\" role=\"button\">Get back</a>");
+
+                    out.println("</div>");
+                    out.println("<script src=\"https://code.jquery.com/jquery-3.2.1.slim.min.js\" integrity=\"sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN\" crossorigin=\"anonymous\"></script>");
+                    out.println("<script src=\"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js\" integrity=\"sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4\" crossorigin=\"anonymous\"></script>");
+                    out.println("<script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js\" integrity=\"sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1\" crossorigin=\"anonymous\"></script>");
+
+                    out.println("</body>");
+                    out.println("</html>");
                 }
+                else
+                {
+                    // Register JDBC driver
+                    Class.forName(JDBC_DRIVER).newInstance();
 
-                if (password == null || (password.trim()).length() == 0) {
-                   out.println("<p>Password: MISSING</p>");
+                    // Open a connection
+                    conn = DriverManager.getConnection(DB_URL, USER, PASS);
+                    stmt = conn.createStatement();
+
+                    // Execute SQL query
+                    String sql;
+
+                    // 'email' is a primary key. Therefore, only one record
+                    // will be retreived, if present
+                    sql = "SELECT * FROM users WHERE email = \'" + email + "\'";
+
+                    ResultSet rs = stmt.executeQuery(sql);
+
+                    String fname = "", sname = "", mail = "", pass = "";
+
+                    if(!rs.next())
+                    {
+                        // database does not contain a record with specified email address
+                        out.println("<h2>Wrong email address!</h2>");
+                        out.println("<a href=\"index.html\" class=\"btn btn-primary\" role=\"button\">Get back</a>");
+                    }else
+                    {
+                        rs.beforeFirst();
+                        while(rs.next())
+                        {
+                            // Retrieve by column name
+                            fname = rs.getString("fname");
+                            sname = rs.getString("sname");
+                            mail = rs.getString("email");
+                            pass = rs.getString("password");
+
+                            // matching email and password = LogIn
+                            if(mail.trim().equals(email) && pass.trim().equals(password))
+                            {
+                                // create session
+                                session=request.getSession();
+                                session.setAttribute("username",email);
+
+                                out.println("<h2>Welcome, " + fname + " " + sname + "! Details of your account: </h2>");
+                                out.println("<table class=\"table table-striped\">");
+                                 // Table Header
+                                 out.println("<thead>");
+                                  out.println("<tr>");
+                                    out.println("<th>Firstname</th>");
+                                    out.println("<th>Surname</th>");
+                                    out.println("<th>Email</th>");
+                                    out.println("<th>Password</th>");
+                                  out.println("</tr>");
+                                 out.println("</thead>");
+                                  // Display values
+                                  out.println("<tr>");
+                                    out.println("<td>" + fname + "</td>");
+                                    out.println("<td>" + sname + "</td>");
+                                    out.println("<td>" + mail + "</td>");
+                                    out.println("<td>" + pass + "</td>");
+                                  out.println("</tr>");
+
+                                 out.println("</tbody>");
+                                out.println("</table>");
+                                out.println("<a href=\"LogOut\" class=\"btn btn-primary\" role=\"button\">Log out</a>");
+                            }
+                            else
+                            {
+                                // mismatch of password and email
+                                out.println("<h1>Wrong password! </h1>");
+                                out.println("<a href=\"index.html\" class=\"btn btn-primary\" role=\"button\">Get back</a>");
+                            }
+                        }
+                    }
+
+                    out.println("</div>");
+
+                    out.println("<script src=\"https://code.jquery.com/jquery-3.2.1.slim.min.js\" integrity=\"sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN\" crossorigin=\"anonymous\"></script>");
+                    out.println("<script src=\"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js\" integrity=\"sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4\" crossorigin=\"anonymous\"></script>");
+                    out.println("<script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js\" integrity=\"sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1\" crossorigin=\"anonymous\"></script>");
+
+                    out.println("</body>");
+                    out.println("</html>");
+
+                    // Clean-up environment
+                    rs.close();
+                    stmt.close();
+                    conn.close();
                 }
-                
-                out.println("<a href=\"index.html\" class=\"btn btn-primary\" role=\"button\">Get back</a>");
-
-                out.println("</div>");
-                out.println("<script src=\"https://code.jquery.com/jquery-3.2.1.slim.min.js\" integrity=\"sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN\" crossorigin=\"anonymous\"></script>");
-                out.println("<script src=\"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js\" integrity=\"sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4\" crossorigin=\"anonymous\"></script>");
-                out.println("<script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js\" integrity=\"sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1\" crossorigin=\"anonymous\"></script>");
-
-                out.println("</body>");
-                out.println("</html>");
-            }
-            else
+            } else      // The Session exists already
             {
+
+                String emailAddress =session.getAttribute("username").toString().trim();
+
                 // Register JDBC driver
                 Class.forName(JDBC_DRIVER).newInstance();
 
                 // Open a connection
                 conn = DriverManager.getConnection(DB_URL, USER, PASS);
                 stmt = conn.createStatement();
-                
-                // Execute SQL query               
+
+                // Execute SQL query
                 String sql;
-                
+
                 // 'email' is a primary key. Therefore, only one record
                 // will be retreived, if present
-                sql = "SELECT * FROM users WHERE email = \'" + email + "\'";
+                sql = "SELECT * FROM users WHERE email = \'" + emailAddress + "\'";
 
                 ResultSet rs = stmt.executeQuery(sql);
-                
+
                 String fname = "", sname = "", mail = "", pass = "";
-                
-                if(!rs.next())
+
+                while(rs.next())
                 {
-                    out.println("<center>");
-                    // database does not contain a record with specified email address
-                    out.println("<p>Wrong email address!</p>");
-                    //out.println("<a href=\"index.html\" class=\"btn btn-primary\" role=\"button\">Get back</a>");
-                    out.println("</center>");
-                    
-                    RequestDispatcher rd=request.getRequestDispatcher("/index.html");  
-                    rd.include(request, response);                    
-                }else
-                {                  
-                    rs.beforeFirst();
-                    while(rs.next())
-                    {
-                        // Retrieve by column name
-                        fname = rs.getString("fname");
-                        sname = rs.getString("sname");
-                        mail = rs.getString("email");
-                        pass = rs.getString("password");
+                    // Retrieve by column name
+                    fname = rs.getString("fname");
+                    sname = rs.getString("sname");
+                    mail = rs.getString("email");
+                    pass = rs.getString("password");
 
-                        // matching email and password = LogIn
-                        if(mail.trim().equals(email) && pass.trim().equals(password))
-                        {
-                            // create session
-//                            HttpSession session=request.getSession();  
-//                            session.setAttribute("username",email);
-                            
-                            out.println("<h2>Welcome, " + fname + " " + sname + "! Details of your account: </h2>");
-                            out.println("<table class=\"table table-striped\">");
-                             // Table Header
-                             out.println("<thead>");
-                              out.println("<tr>");
-                                out.println("<th>Firstname</th>");
-                                out.println("<th>Surname</th>");
-                                out.println("<th>Email</th>");
-                                out.println("<th>Password</th>");
-                              out.println("</tr>");
-                             out.println("</thead>");
-                              // Display values
-                              out.println("<tr>");                       
-                                out.println("<td>" + fname + "</td>");
-                                out.println("<td>" + sname + "</td>");
-                                out.println("<td>" + mail + "</td>");
-                                out.println("<td>" + pass + "</td>");
-                              out.println("</tr>");
+                    out.println("<h2>Welcome, " + fname + " " + sname + "! Details of your account: </h2>");
+                    out.println("<table class=\"table table-striped\">");
+                     // Table Header
+                     out.println("<thead>");
+                      out.println("<tr>");
+                        out.println("<th>Firstname</th>");
+                        out.println("<th>Surname</th>");
+                        out.println("<th>Email</th>");
+                        out.println("<th>Password</th>");
+                      out.println("</tr>");
+                     out.println("</thead>");
+                      // Display values
+                      out.println("<tr>");
+                        out.println("<td>" + fname + "</td>");
+                        out.println("<td>" + sname + "</td>");
+                        out.println("<td>" + mail + "</td>");
+                        out.println("<td>" + pass + "</td>");
+                      out.println("</tr>");
 
-                             out.println("</tbody>");
-                            out.println("</table>");
-                        }
-                        else
-                        {
-                            // mismatch of password and email
-                            out.println("<h1>Wrong password! </h1>");
-                            out.println("<a href=\"index.html\" class=\"btn btn-primary\" role=\"button\">Get back</a>");
-                        }             
-                    }
+                     out.println("</tbody>");
+                    out.println("</table>");
+                    out.println("<a href=\"LogOut\" class=\"btn btn-primary\" role=\"button\">Log out</a>");
+
                 }
-                
+
                 out.println("</div>");
 
                 out.println("<script src=\"https://code.jquery.com/jquery-3.2.1.slim.min.js\" integrity=\"sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN\" crossorigin=\"anonymous\"></script>");
@@ -206,6 +275,6 @@ public class LoginServlet extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-    
+
 
 }

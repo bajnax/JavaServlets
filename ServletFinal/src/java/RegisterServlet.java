@@ -82,9 +82,9 @@ public class RegisterServlet extends HttpServlet {
             
             if(!rs.next())
             {              
-//                // create session
-//                HttpSession session=request.getSession();  
-//                session.setAttribute("username",email); 
+                // create session
+                HttpSession session=request.getSession();  
+                session.setAttribute("username",email); 
                 
                 sql = "INSERT INTO users (email,password,fname,sname)" +
                 "VALUES (" + "\'" + email + "\'," + " \'" + password + "\'," +
@@ -115,6 +115,7 @@ public class RegisterServlet extends HttpServlet {
 
                 out.println("</tbody>");
                 out.println("</table>");
+                out.println("<a href=\"LogOut\" class=\"btn btn-primary\" role=\"button\">Log out</a>");
             }
             else   // if the user is already registered in the service        
             {
