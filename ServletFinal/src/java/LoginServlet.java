@@ -48,7 +48,7 @@ public class LoginServlet extends HttpServlet {
             out.println("<div class=\"container\">");
 
             // Checking if the session exist already
-            HttpSession session=request.getSession(false);
+            HttpSession session = request.getSession(false);
 
             if(session == null)
             {
@@ -107,7 +107,7 @@ public class LoginServlet extends HttpServlet {
                         rs.beforeFirst();
                         while(rs.next())
                         {
-                            // Retrieve by column name
+                            // Retrieve profile data from ResultSet by column name
                             fname = rs.getString("fname");
                             sname = rs.getString("sname");
                             mail = rs.getString("email");
@@ -118,30 +118,13 @@ public class LoginServlet extends HttpServlet {
                             {
                                 // create session
                                 session=request.getSession();
-                                session.setAttribute("username",email);
-
-                                out.println("<h2>Welcome, " + fname + " " + sname + "! Details of your account: </h2>");
-                                out.println("<table class=\"table table-striped\">");
-                                 // Table Header
-                                 out.println("<thead>");
-                                  out.println("<tr>");
-                                    out.println("<th>Firstname</th>");
-                                    out.println("<th>Surname</th>");
-                                    out.println("<th>Email</th>");
-                                    out.println("<th>Password</th>");
-                                  out.println("</tr>");
-                                 out.println("</thead>");
-                                  // Display values
-                                  out.println("<tr>");
-                                    out.println("<td>" + fname + "</td>");
-                                    out.println("<td>" + sname + "</td>");
-                                    out.println("<td>" + mail + "</td>");
-                                    out.println("<td>" + pass + "</td>");
-                                  out.println("</tr>");
-
-                                 out.println("</tbody>");
-                                out.println("</table>");
-                                out.println("<a href=\"LogOut\" class=\"btn btn-primary\" role=\"button\">Log out</a>");
+                                session.setAttribute("username",mail);
+                                session.setAttribute("firstname", fname);
+                                session.setAttribute("surname", sname);
+                                session.setAttribute("password", pass);
+                                
+                                response.sendRedirect(request.getContextPath() + "/home");
+                            
                             }
                             else
                             {
@@ -168,73 +151,7 @@ public class LoginServlet extends HttpServlet {
                 }
             } else      // The Session exists already
             {
-
-                String emailAddress =session.getAttribute("username").toString().trim();
-
-                // Register JDBC driver
-                Class.forName(JDBC_DRIVER).newInstance();
-
-                // Open a connection
-                conn = DriverManager.getConnection(DB_URL, USER, PASS);
-                stmt = conn.createStatement();
-
-                // Execute SQL query
-                String sql;
-
-                // 'email' is a primary key. Therefore, only one record
-                // will be retreived, if present
-                sql = "SELECT * FROM users WHERE email = \'" + emailAddress + "\'";
-
-                ResultSet rs = stmt.executeQuery(sql);
-
-                String fname = "", sname = "", mail = "", pass = "";
-
-                while(rs.next())
-                {
-                    // Retrieve by column name
-                    fname = rs.getString("fname");
-                    sname = rs.getString("sname");
-                    mail = rs.getString("email");
-                    pass = rs.getString("password");
-
-                    out.println("<h2>Welcome, " + fname + " " + sname + "! Details of your account: </h2>");
-                    out.println("<table class=\"table table-striped\">");
-                     // Table Header
-                     out.println("<thead>");
-                      out.println("<tr>");
-                        out.println("<th>Firstname</th>");
-                        out.println("<th>Surname</th>");
-                        out.println("<th>Email</th>");
-                        out.println("<th>Password</th>");
-                      out.println("</tr>");
-                     out.println("</thead>");
-                      // Display values
-                      out.println("<tr>");
-                        out.println("<td>" + fname + "</td>");
-                        out.println("<td>" + sname + "</td>");
-                        out.println("<td>" + mail + "</td>");
-                        out.println("<td>" + pass + "</td>");
-                      out.println("</tr>");
-
-                     out.println("</tbody>");
-                    out.println("</table>");
-                    out.println("<a href=\"LogOut\" class=\"btn btn-primary\" role=\"button\">Log out</a>");
-
-                }
-
-                out.println("</div>");
-
-                out.println("<script src=\"https://code.jquery.com/jquery-3.2.1.slim.min.js\" integrity=\"sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN\" crossorigin=\"anonymous\"></script>");
-                out.println("<script src=\"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js\" integrity=\"sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4\" crossorigin=\"anonymous\"></script>");
-                out.println("<script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js\" integrity=\"sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1\" crossorigin=\"anonymous\"></script>");
-
-                out.println("</body>");
-                out.println("</html>");
-
-                // Clean-up environment
-                rs.close();
-                stmt.close();
-                conn.close();
+                response.sendRedirect(request.getContextPath() + "/home");
             }
 
         }catch(SQLException se) {

@@ -30,12 +30,23 @@ public class LogOut extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException 
     {
-        // closing the session
-        HttpSession session=request.getSession();  
-        session.invalidate();  
+        // Checking if the session exist already
+        HttpSession session=request.getSession(false);
+        
+        if(session != null)
+        {
+            // closing the session
+            session=request.getSession();  
+            session.invalidate();  
 
-        // redirecting to the index page
-        response.sendRedirect("index.html");
+            // redirecting to the index page
+            response.sendRedirect("index.html");
+        } else
+        {
+            // redirecting to the index page
+            response.sendRedirect("index.html");
+        }
+        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
